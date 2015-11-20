@@ -17,8 +17,6 @@ module.exports = function (aws, options) {
   var regexGeneral = /\.([a-z]{2,})$/i;
 
   return es.mapSync(function (file) {
-      var self = this;
-
       // Verify this is a file
       if (!file.isBuffer()) { return file; }
 
@@ -53,7 +51,7 @@ module.exports = function (aws, options) {
       client.putBuffer(file.contents, uploadPath, headers, function(err, res) {
         if (err || res.statusCode !== 200) {
           var error = new gutil.PluginError('gulp-s3', 'Failed to push to S3', {showStack: true});
-          self.emit('error', error)
+          throw error;
         } else {
           gutil.log(gutil.colors.green('[SUCCESS]', file.path + " -> " + uploadPath));
           res.resume();
