@@ -8,7 +8,6 @@ mime.default_type = 'text/plain';
 
 module.exports = function (aws, options) {
   options = options || {};
-  var self = this;
 
   if (!options.delay) { options.delay = 0; }
 
@@ -18,6 +17,7 @@ module.exports = function (aws, options) {
   var regexGeneral = /\.([a-z]{2,})$/i;
 
   return es.mapSync(function (file) {
+      var self = this;
 
       // Verify this is a file
       if (!file.isBuffer()) { return file; }
