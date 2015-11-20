@@ -8,6 +8,7 @@ mime.default_type = 'text/plain';
 
 module.exports = function (aws, options) {
   options = options || {};
+  var self = this;
 
   if (!options.delay) { options.delay = 0; }
 
@@ -30,7 +31,7 @@ module.exports = function (aws, options) {
           }
       }
 
-      if (regexGzip.test(file.path)) {
+      if (options.gzippedOnly && regexGzip.test(file.path)) {
           // Set proper encoding for gzipped files, remove .gz suffix
           headers['Content-Encoding'] = 'gzip';
           uploadPath = uploadPath.substring(0, uploadPath.length - 3);
@@ -51,7 +52,8 @@ module.exports = function (aws, options) {
 
       client.putBuffer(file.contents, uploadPath, headers, function(err, res) {
         if (err || res.statusCode !== 200) {
-          gutil.log(gutil.colors.red('[FAILED]', file.path + " -> " + uploadPath));
+          var error = new gutil.PluginError('gulp-s3', 'Failed to push to S3', {showStack: true});
+          self.emit('error', error)
         } else {
           gutil.log(gutil.colors.green('[SUCCESS]', file.path + " -> " + uploadPath));
           res.resume();
